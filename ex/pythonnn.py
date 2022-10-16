@@ -5,14 +5,9 @@ import sqlite3
 app = Flask(__name__)
 
 
-@app.route("/")
-
-def home():
-
-    return "NFT"
 
 
-@app.route('/data/', methods = ['POST', 'GET'])
+@app.route('/', methods = ['POST', 'GET'])
 def data():
     return render_template('form.html')
      
@@ -26,7 +21,7 @@ import requests
 
 
 
-nft = "3HcD2Zz7cpZShUbS4KTEAXfLu31Yb9zb8wcJmNB6cQsh"
+nft = input
 
 url = f"https://solana-gateway.moralis.io/nft/mainnet/{nft}/metadata"
 
