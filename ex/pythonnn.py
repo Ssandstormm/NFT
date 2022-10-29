@@ -1,30 +1,45 @@
 
 from flask import Flask, request,render_template,jsonify,redirect,url_for
 import sqlite3
-
+import requests
 app = Flask(__name__)
-
-
 
 
 @app.route('/', methods = ['POST', 'GET'])
 def data():
     return render_template('form.html')
-     
-
-
-if __name__ == "__main__":
-
-    app.run(debug=True)
-import requests
-
 
 
 
 nft = input
 
 url = f"https://solana-gateway.moralis.io/nft/mainnet/{nft}/metadata"
+def form_example(): 
+    if request.method == 'POST': 
+        returnValue="" 
+        address = request.form.get('address') 
+        if(check_in_db(address)): 
+            conn = psycopg2.connect("dbname=nft_py user=postgres password='123'") 
+            cur = conn.cursor() 
+            cur.execute("SELECT nft_metadata FROM nfts where nft_address='"+address+"'") 
+            records = cur.fetchall() 
+            returnValue=records[0][0] 
+        else:             
+            url = "https://solana-gateway.moralis.io/nft/mainnet/{}/metadata".format(address) 
+            headers = { 
+                "accept": "application/json", 
+                "X-API-Key": "OjvXHY7ltVwY7xKG1p9HtQmLfKuRiodrazyFMLx2ZAAzECrZY7soe5LMcTTIvj8z" 
+            } 
+            returnValue = requests.get(url, headers=headers).text 
+            conn = psycopg2.connect("dbname=nft_py user=postgres password='123'") 
+            cur = conn.cursor() 
+            cur.execute("insert into nfts(nft_address,nft_metadata) values('{}','{}')".format(address, returnValue)) 
+            conn.commit() 
+        return ''' 
+                <h1>{}</h1> 
+                  '''.format(returnValue)
 
+     
 
 
 headers = {
@@ -52,6 +67,11 @@ def json_data():
     # return json
     return jsonify(dict(cursor.fetchall(), start=1))
 
+
+
+if __name__ == "__main__":
+
+    app.run(debug=True)
 
 
 import psycopg2
